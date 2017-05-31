@@ -2,23 +2,27 @@
     "name": "HoloDemo",
     "scope": "gameFiles",
     "components": [
+        "collisions.js",
         "heimdall.js",
         "components.js"
     ],
     "levels": [
         "levels.xml"
     ],
-    "spritesheets":[
+    "spritesheets": [
         "spritesheets.xml"
     ],
     "screenResolution": {
         "w": 1366,
         "h": 768
     },
-    "dependencies": {},
-    "themeColor":"#4B5",
-    "backgroundColor":"#333",
-    "tileIcon":"tileIcon.png",
+    "dependencies": {
+        "pointBoxCollision2D": "1.0",
+        "mouse": "1.0"        
+    },
+    "themeColor": "#4B5",
+    "backgroundColor": "#333",
+    "tileIcon": "tileIcon.png",
     "enginefps": 60,
     "animationfps": 60
 }

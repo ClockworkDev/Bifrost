@@ -4,6 +4,7 @@ var heimdall = (function () {
     var library = null;
     var cachedLogs = [];
     var log = function (x) { cachedLogs.push(x) };
+    var engineMessageHandler = function () { };
 
     var cachedMessages = [];
 
@@ -17,6 +18,8 @@ var heimdall = (function () {
         log(JSON.stringify(e));
     }
 
+    var playerId = 0;
+
     var onServerAccept = function (eventArgument) {
         log("Connection accepted");
         var tcpSocket = eventArgument.socket;
@@ -29,7 +32,7 @@ var heimdall = (function () {
             writer.storeAsync();
         };
         cachedMessages.forEach(sendMessage);
-        startServerRead(tcpReader);
+        startServerRead(tcpReader, playerId++);
     }
 
     var tcpListener = new Windows.Networking.Sockets.StreamSocketListener("87776");
@@ -40,7 +43,7 @@ var heimdall = (function () {
 
     window.listener = tcpListener;
 
-    var startServerRead = function (tcpReader) {
+    var startServerRead = function (tcpReader, playerId) {
         tcpReader.loadAsync(4).done(function (sizeBytesRead) {
             // Make sure 4 bytes were read.
             if (sizeBytesRead !== 4) {
@@ -57,11 +60,11 @@ var heimdall = (function () {
                 }
                 // Read in the string.
                 var string = tcpReader.readString(count);
-                log("Server read: " + string);
                 var data = JSON.parse(string);
-                log(data[0]);
+                engineMessageHandler({ player: playerId, data: data });
+
                 // Restart the read for more bytes.
-                startServerRead(tcpReader);
+                startServerRead(tcpReader, playerId);
             }); // End of "read in rest of string" function.
         }, onError);
     }
@@ -109,20 +112,20 @@ var heimdall = (function () {
                 for (var spNumber in newspritesheets) {
                     var spritesheet = newspritesheets[spNumber];
                     if (spritesheet.src) {
-                        var newPromise = new Promise(function (res, rej) {
+                        var newPromise = new Promise((function (src, res, rej) {
                             var img = new Image();
                             img.src = library.getWorkingFolder() + "/" + spritesheet.src;
-                            img.onload = function () {
+                            img.onload = (function () {
                                 var canvas = document.createElement('canvas');
                                 canvas.width = this.naturalWidth;
                                 canvas.height = this.naturalHeight;
                                 canvas.getContext('2d').drawImage(this, 0, 0);
                                 var imageData = canvas.toDataURL('image/png').replace(/^data:image\/(png|jpg);base64,/, '');
-                                var msg = ["registerImage", spritesheet.src, imageData];
+                                var msg = ["registerImage", src, imageData];
                                 sendMessage(msg);
                                 res();
-                            }
-                        });
+                            })
+                        }).bind(this, spritesheet.src));
                         promises.push(newPromise);
                     }
                 }
@@ -136,11 +139,12 @@ var heimdall = (function () {
         addObject: function (spritesheet, state, x, y, z, isstatic) {
             //This function creates an object rendered by the given spritesheet, at the given state, at the given positions and which might or not have an static position relative to the camera
             //This function returns the object id
+            var id = library.addObject(spritesheet, state, x, y, z, isstatic);
             if (sendMessage != null) {
-                var msg = ["addObject", spritesheet, state, x, y, z, isstatic];
+                var msg = ["addObject", id, spritesheet, state, x, z, y, isstatic];
                 sendMessage(msg);
             }
-            return library.addObject(spritesheet, state, x, y, z, isstatic);
+            return id;
         },
         deleteObject: function (id) {
             //This function deletes the object with the given id
@@ -185,7 +189,7 @@ var heimdall = (function () {
         setY: function (id, y) {
             //This function sets the y coordinate of an object
             if (sendMessage != null) {
-                var msg = ["setY", id, y];
+                var msg = ["setZ", id, y];
                 sendMessage(msg);
             }
             return library.setY(id, y);
@@ -193,17 +197,18 @@ var heimdall = (function () {
         setZ: function (id, z) {
             //This function sets the z coordinate of an object
             if (sendMessage != null) {
-                var msg = ["setZ", id, z];
+                var msg = ["setY", id, z];
                 sendMessage(msg);
             }
             return library.setZ(id, z);
         },
         setParameter: function (id, key, value) {
             //This function sets a parameter of an object
-            if (sendMessage != null) {
-                var msg = ["setParameter", id, key, value];
-                sendMessage(msg);
-            }
+            //Dont do it for now, since it is not recognized by the HoloLens app
+            // if (sendMessage != null) {
+            //     var msg = ["setParameter", id, key, value];
+            //     sendMessage(msg);
+            // }
             return library.setParameter(id, key, value);
         },
         setState: function (id, state) {
@@ -224,6 +229,10 @@ var heimdall = (function () {
         },
         sendCommand: function (command, commandArgs) {
             //This function sends a command to your library, you can use this an extension point to provide additional functionality
+            if (command == "registerEngineMessageHandler") {
+                engineMessageHandler = commandArgs;
+                return;
+            }
             if (sendMessage != null) {
                 var msg = ["sendCommand", command, commandArgs];
                 sendMessage(msg);

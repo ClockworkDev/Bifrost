@@ -1,109 +1,154 @@
 <?xml version="1.0" encoding="utf-8"?>
 <spritesheets>
-  <spritesheet name="dog" src="images/dog.png">
+  <spritesheet name="background" positionBasedOptimizations="false">
     <states>
-      <state name="IdleL">
-        <layer name="Idle1"></layer>
-        <layer name="text"></layer>
-      </state>
-      <state name="IdleR" flip="h">
-        <layer name="Idle1"></layer>
-        <layer name="text"></layer>
-      </state>
-      <state name="RunL">
-        <layer name="Run1"></layer>
-        <layer name="text"></layer>
-      </state>
-      <state name="RunR" flip="h">
-        <layer name="Run1"></layer>
-        <layer name="text"></layer>
-      </state>
-      <state name="SeeUL">
-        <layer name="SeeU1"></layer>
-        <layer name="text"></layer>
-      </state>
-      <state name="SeeUR" flip="h">
-        <layer name="SeeU1"></layer>
-        <layer name="text"></layer>
-      </state>
-      <state name="BarkL">
-        <layer name="Bark1"></layer>
-        <layer name="text"></layer>
-      </state>
-      <state name="BarkR" flip="h">
-        <layer name="Bark1"></layer>
-        <layer name="text"></layer>
-      </state>
-      <state name="Scare">
-        <layer name="Scare1"></layer>
-        <layer name="text"></layer>
+      <state name="background">
+        <layer name="background"></layer>
       </state>
     </states>
     <layers>
-      <layer name="Idle1" x="0" y="0">
-        <frame name="I1"></frame>
-        <frame name="I2"></frame>
-        <frame name="I3"></frame>
-        <frame name="I4"></frame>
-        <frame name="I5"></frame>
-        <frame name="I6"></frame>
-      </layer>
-      <layer name="Run1" x="0" y="0">
-        <frame name="R1"></frame>
-        <frame name="R2"></frame>
-        <frame name="R3"></frame>
-        <frame name="R4"></frame>
-        <frame name="R5"></frame>
-        <frame name="R6"></frame>
-      </layer>
-      <layer name="SeeU1" x="0" y="0">
-        <frame name="S1"></frame>
-        <frame name="S2"></frame>
-        <frame name="S3"></frame>
-      </layer>
-      <layer name="Bark1" x="0" y="0">
-        <frame name="B1"></frame>
-        <frame name="B2"></frame>
-        <frame name="B3"></frame>
-        <frame name="B4"></frame>
-      </layer>
-      <layer name="Scare1" x="0" y="0">
-        <frame name="O1"></frame>
-        <frame name="O2"></frame>
-        <frame name="O3"></frame>
-        <frame name="O4"></frame>
-        <frame name="O5"></frame>
-      </layer>
-      <layer name="text" x="55" y="110">
-        <frame name="text"></frame>
+      <layer name="background" x="0" y="0">
+        <frame name="background"></frame>
       </layer>
     </layers>
     <frames>
-      <frame name="I1" x="0" y="0" w="117" h="118" t="100"></frame>
-      <frame name="I2" x="117" y="0" w="117" h="118" t="100"></frame>
-      <frame name="I3" x="234" y="0" w="117" h="118" t="100"></frame>
-      <frame name="I4" x="351" y="0" w="117" h="118" t="100"></frame>
-      <frame name="I5" x="468" y="0" w="117" h="118" t="100"></frame>
-      <frame name="I6" x="585" y="0" w="117" h="118" t="100"></frame>
-      <frame name="R1" x="0" y="354" w="117" h="118" t="100"></frame>
-      <frame name="R2" x="117" y="354" w="117" h="118" t="100"></frame>
-      <frame name="R3" x="234" y="354" w="117" h="118" t="100"></frame>
-      <frame name="R4" x="351" y="354" w="117" h="118" t="100"></frame>
-      <frame name="R5" x="468" y="354" w="117" h="118" t="100"></frame>
-      <frame name="R6" x="585" y="354" w="117" h="118" t="100"></frame>
-      <frame name="S1" x="0" y="118" w="117" h="118" t="100"></frame>
-      <frame name="S2" x="117" y="118" w="117" h="118" t="500"></frame>
-      <frame name="S3" x="234" y="118" w="117" h="118" t="100"></frame>
-      <frame name="B1" x="0" y="472" w="117" h="118" t="100"></frame>
-      <frame name="B2" x="117" y="472" w="117" h="118" t="100"></frame>
-      <frame name="B3" x="234" y="472" w="117" h="118" t="100"></frame>
-      <frame name="B4" x="351" y="472" w="117" h="118" t="100"></frame>
-      <frame name="O1" x="0" y="236" w="117" h="118" t="100"></frame>
-      <frame name="O2" x="117" y="236" w="117" h="118" t="100"></frame>
-      <frame name="O3" x="234" y="236" w="117" h="118" t="100"></frame>
-      <frame name="O4" x="351" y="236" w="117" h="118" t="100"></frame>
-      <frame name="O5" x="468" y="236" w="117" h="118" t="100"></frame>
-      <frame name="text" code="context.textBaseline ='top';context.textAlign='center';context.font='20pt Verdana';context.fillStyle = '#FFF';context.fillText(vars['$text'],x,y);" t="0"></frame>
+      <frame name="background" code="context.fillStyle='black';context.fillRect(0,0,1266,768);" t="100"></frame>
+    </frames>
+  </spritesheet>
+  <spritesheet name="player">
+    <states>
+      <state name="player">
+        <layer name="fov"></layer>
+        <layer name="player"></layer>
+      </state>
+    </states>
+    <layers>
+      <layer name="player" x="0" y="0">
+        <frame name="player"></frame>
+      </layer>
+      <layer name="fov" x="0" y="0">
+        <frame name="fov"></frame>
+      </layer>
+    </layers>
+    <frames>
+      <frame name="player" code="context.strokeStyle='white';context.lineWidth=5;context.beginPath();context.arc(x,y,10,0,2*Math.PI);context.stroke();" t="100"></frame>
+      <frame name="fov" code="context.strokeStyle='#00c8ff';context.lineWidth=15;context.beginPath();context.arc(x,y,30,vars.$angle-0.5,vars.$angle+0.5);context.stroke();" t="100"></frame>
+    </frames>
+  </spritesheet>
+  <spritesheet name="bomb" src="images/bomb.png">
+    <states>
+      <state name="idle">
+        <layer name="idle"></layer>
+      </state>
+      <state name="warning">
+        <layer name="warning"></layer>
+      </state>
+      <state name="danger">
+        <layer name="danger"></layer>
+      </state>
+    </states>
+    <layers>
+      <layer name="idle" x="-50" y="-50">
+        <frame name="idle"></frame>
+      </layer>
+      <layer name="warning" x="-50" y="-50">
+        <frame name="idle"></frame>
+        <frame name="glow"></frame>
+      </layer>
+      <layer name="danger" x="-50" y="-50">
+        <frame name="glow"></frame>
+        <frame name="red"></frame>
+      </layer>
+    </layers>
+    <frames>
+      <frame name="idle" x="0" y="0" w="100" h="100" t="100"></frame>
+      <frame name="glow" x="100" y="0" w="100" h="100" t="100"></frame>
+      <frame name="red" x="200" y="0" w="100" h="100" t="100"></frame>
+    </frames>
+  </spritesheet>
+  <spritesheet name="player">
+    <states>
+      <state name="player">
+        <layer name="fov"></layer>
+        <layer name="player"></layer>
+      </state>
+    </states>
+    <layers>
+      <layer name="player" x="0" y="0">
+        <frame name="player"></frame>
+      </layer>
+      <layer name="fov" x="0" y="0">
+        <frame name="fov"></frame>
+      </layer>
+    </layers>
+    <frames>
+      <frame name="player" code="context.strokeStyle='white';context.beginPath();context.arc(x,y,5,0,2*Math.PI);context.stroke();" t="100"></frame>
+      <frame name="fov" code="context.strokeStyle='#AAF';context.beginPath();context.arc(x,y,50,vars.$angle-0.5,vars.$angle+0.5);context.stroke();" t="100"></frame>
+    </frames>
+  </spritesheet>
+  <spritesheet name="plasma" src="images/plasma.png">
+    <states>
+      <state name="idle">
+        <layer name="idle"></layer>
+      </state>
+    </states>
+    <layers>
+      <layer name="idle" x="-25" y="-25">
+        <frame name="round"></frame>
+        <frame name="star"></frame>
+        <frame name="round"></frame>
+        <frame name="tri"></frame>
+      </layer>
+    </layers>
+    <frames>
+      <frame name="round" x="0" y="0" w="50" h="50" t="100"></frame>
+      <frame name="star" x="50" y="0" w="50" h="50" t="100"></frame>
+      <frame name="tri" x="100" y="0" w="50" h="50" t="100"></frame>
+    </frames>
+  </spritesheet>
+  <spritesheet name="explosion" src="images/explosion.png">
+    <states>
+      <state name="good">
+      </state>
+      <state name="good">
+        <layer name="good"></layer>
+      </state>
+      <state name="bad">
+        <layer name="bad"></layer>
+      </state>
+    </states>
+    <layers>
+      <layer name="good" x="-150" y="-150">
+        <frame name="fire"></frame>
+        <frame name="explode"></frame>
+        <frame name="sparkle"></frame>
+      </layer>
+      <layer name="bad" x="-150" y="-150">
+        <frame name="fire"></frame>
+        <frame name="explode"></frame>
+        <frame name="skull"></frame>
+      </layer>
+    </layers>
+    <frames>
+      <frame name="fire" x="0" y="0" w="300" h="300" t="200"></frame>
+      <frame name="explode" x="300" y="0" w="300" h="300" t="200"></frame>
+      <frame name="sparkle" x="600" y="0" w="300" h="300" t="0"></frame>
+      <frame name="skull" x="900" y="0" w="300" h="300" t="0"></frame>
+    </frames>
+  </spritesheet>
+  <spritesheet name="meshRenderer" positionBasedOptimizations="false">
+    <states>
+      <state name="mesh">
+        <layer name="mesh"></layer>
+      </state>
+    </states>
+    <layers>
+      <layer name="mesh" x="0" y="0">
+        <frame name="mesh"></frame>
+      </layer>
+    </layers>
+    <frames>
+      <frame name="mesh" code="      for(var id in vars.$images){    if(vars.$images[id]){    context.drawImage(vars.$images[id].canvas,x+vars.$images[id].x,y+vars.$images[id].y);  }    }      " t="100"></frame>
     </frames>
   </spritesheet>
 </spritesheets>

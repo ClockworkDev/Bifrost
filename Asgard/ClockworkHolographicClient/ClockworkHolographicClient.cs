@@ -18,6 +18,7 @@ using ClockworkHolographicClient.Common;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using System.Collections.Generic;
+using Windows.Perception.Spatial.Surfaces;
 
 #if DRAW_SAMPLE_CONTENT
 using ClockworkHolographicClient.Content;
@@ -120,6 +121,28 @@ namespace ClockworkHolographicClient
             //   indicates to be of special interest. Anchor positions do not drift, but can be corrected; the
             //   anchor will use the corrected position starting in the next frame after the correction has
             //   occurred.
+            ClockworkSocket.setCoordinateSystem(referenceFrame.CoordinateSystem);
+            setUpSpatialMapping(referenceFrame.CoordinateSystem);
+        }
+
+        internal async void setUpSpatialMapping(SpatialCoordinateSystem coordinateSystem)
+        {
+           if( !Windows.Foundation.Metadata.ApiInformation.IsApiContractPresent("Windows.Foundation.UniversalApiContract", 4) || SpatialSurfaceObserver.IsSupported())
+            {
+                SpatialPerceptionAccessStatus status = await SpatialSurfaceObserver.RequestAccessAsync();
+                if(status == SpatialPerceptionAccessStatus.Allowed)
+                {
+                    SpatialSurfaceObserver observer = new SpatialSurfaceObserver();
+                    SpatialBoundingBox boundingBox = new SpatialBoundingBox()
+                    {
+                        Center= new System.Numerics.Vector3(0,0,0),
+                        Extents= new System.Numerics.Vector3(40,40,5)
+                    };
+                    SpatialBoundingVolume bounds = SpatialBoundingVolume.FromBox(coordinateSystem,boundingBox);
+                    observer.SetBoundingVolume(bounds);
+                    observer.ObservedSurfacesChanged += new TypedEventHandler<SpatialSurfaceObserver, object>(ClockworkSocket.SurfacesChanged);
+                }
+            }
         }
 
         public void Dispose()
@@ -173,6 +196,7 @@ namespace ClockworkHolographicClient
                 //
                 SpatialPointerPose playerPosition = Windows.UI.Input.Spatial.SpatialPointerPose.TryGetAtTimestamp(currentCoordinateSystem, prediction.Timestamp);
                 spritesRenderer.Update(timer, playerPosition);
+                ClockworkSocket.processInput("move",playerPosition);
             });
 
             // We complete the frame update by using information about our content positioning

@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <levels>
   <level id="mainLevel">
-    <object name="JakeTheDog" type="talkingDog" x="0" y="0" z="0"></object>
-    <object name="JakeTheDog" type="talkingDog" x="0" y="200" z="25"></object>
-    <object name="JakeTheDog" type="talkingDog" x="200" y="0" z="75"></object>
-    <object name="JakeTheDog" type="talkingDog" x="200" y="200" z="50"></object>
+    <object name="background" type="background" x="0" y="0" z="-100" static="true"></object>
+    <object name="meshRenderer" type="meshRenderer" x="0" y="0" z="-50"></object>
+    <object name="mouse" type="mouse" x="0" y="0" z="0"></object>
+    <object name="objectSpawner" type="objectSpawner" x="0" y="0" z="0" static="true"></object>
+    <object name="incomingDataHandler" type="incomingDataHandler" x="0" y="0" z="0"></object>
+    <object name="player" type="player" x="0" y="0" z="0"></object>
   </level>
 </levels>

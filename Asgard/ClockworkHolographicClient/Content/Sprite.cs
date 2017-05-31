@@ -22,7 +22,6 @@ namespace ClockworkHolographicClient.Content
         private System.Numerics.Vector3 position;
         private string spriteImg;
         private DeviceResources cachedResources;
-        float scaleFactor = 0.001f;
         ShaderResourceView textureView;
 
 
@@ -40,7 +39,7 @@ namespace ClockworkHolographicClient.Content
 
         public Sprite(float x, float y, float z, string spriteImg)
         {
-            position = new System.Numerics.Vector3(x * scaleFactor, y * scaleFactor, z * scaleFactor);
+            position = new System.Numerics.Vector3(x * Spritesheet.positionScaleFactor, y * Spritesheet.positionScaleFactor, z * Spritesheet.positionScaleFactor);
             this.spriteImg = spriteImg;
             hasLoaded = false;
         }
@@ -99,8 +98,8 @@ namespace ClockworkHolographicClient.Content
             float u2 = (x + w) / imageWidth;
             float v1 = y / imageHeight;
             float v2 = (y + h) / imageHeight;
-            var height = imageHeight * scaleFactor * (v2 - v1) / 2;
-            var width = imageWidth * scaleFactor * (u2 - u1) / 2;
+            var height = imageHeight * Spritesheet.textureScaleFactor * (v2 - v1) / 2;
+            var width = imageWidth * Spritesheet.textureScaleFactor * (u2 - u1) / 2;
             VertexPositionTexture[] cubeVertices =
            {
                 new VertexPositionTexture(new System.Numerics.Vector3(-1f*width, -1f*height, 0f), new System.Numerics.Vector2(u1, v2)),
@@ -144,8 +143,8 @@ namespace ClockworkHolographicClient.Content
             imageWidth = bitmapSource.Size.Width;
             imageHeight = bitmapSource.Size.Height;
 
-            var height = bitmapSource.Size.Height * scaleFactor;
-            var width = bitmapSource.Size.Width * scaleFactor;
+            var height = bitmapSource.Size.Height * Spritesheet.textureScaleFactor;
+            var width = bitmapSource.Size.Width * Spritesheet.textureScaleFactor;
 
             BlendStateDescription blendSdesc = new BlendStateDescription();
             blendSdesc.IndependentBlendEnable = false;
@@ -287,7 +286,7 @@ namespace ClockworkHolographicClient.Content
 
         public void setPosition(float x, float y, float z)
         {
-            position = new System.Numerics.Vector3(x * scaleFactor, y * scaleFactor, z * scaleFactor);
+            position = new System.Numerics.Vector3(x * Spritesheet.positionScaleFactor, y * Spritesheet.positionScaleFactor, z * Spritesheet.positionScaleFactor);
         }
     }
 }

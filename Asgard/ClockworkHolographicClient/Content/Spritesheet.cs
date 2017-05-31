@@ -16,57 +16,61 @@ namespace ClockworkHolographicClient.Content
 {
     class Spritesheet
     {
-        private class Frame
+        public static float positionScaleFactor = 0.01f;
+        public static float textureScaleFactor = 0.001f;
+
+        public class Frame
         {
             public String name, code;
             public float x, y, w, h;
             public int t;
         }
 
-        private class Layer
+        public class Layer
         {
             public String name;
             public float x, y;
             public int length;
+            public Boolean infiniteLength;
             public List<Frame> frames;
         }
-        private class State
+        public class State
         {
             public String name;
             public int length;
+            public Boolean infiniteLength;
             public List<Layer> layers;
         }
-        private class JSONLayer
+        public class JSONLayer
         {
             public String name;
             public float x, y;
             public int length;
             public List<String> frames;
         }
-        private class JSONState
+        public class JSONState
         {
             public String name;
             public int length;
             public List<String> layers;
         }
-        private class Sheet
+        public class Sheet
         {
             public String name;
             public string src;
             public List<State> states;
         }
-        private class Object
+        public class Object
         {
             public Sheet sheet;
             public State state;
             public int t;
             public int id;
             public float x, y, z;
-            public List<State> states;
             public Sprite sprite;
             public bool isStatic;
 
-            public Object(Sheet sheet, State state, float x, float y, float z, bool isStatic)
+            public Object(int id, Sheet sheet, State state, float x, float y, float z, bool isStatic)
             {
                 this.sheet = sheet;
                 this.state = state;
@@ -75,7 +79,7 @@ namespace ClockworkHolographicClient.Content
                 this.z = z;
                 this.isStatic = isStatic;
                 t = 0;
-                id = maxId++;
+                this.id = id;
                 sprite = new Sprite(x, y, z, sheet.src);
             }
 
@@ -90,24 +94,35 @@ namespace ClockworkHolographicClient.Content
                 else
                 {
                     t += millisecondsPerUpdate;
-                    t = t % state.length;
+                    if (state.infiniteLength == false)
+                    {
+                        t = t % state.length;
+                    }
                     //TODO:Support for multiple layers
                     Layer layer = state.layers.First();
                     int timeAcc = 0, frameN = 0;
+                    bool substractFlag = false;
                     while (timeAcc < t)
                     {
-                        timeAcc += layer.frames[frameN].t;
+                        Frame thisFrame = layer.frames[frameN];
+                        substractFlag = true;
+                        if (thisFrame.t == 0)
+                        {
+                            substractFlag = false;
+                            break;
+                        }
                         frameN++;
-                        if (layer.frames[frameN - 1].t == 0)
+                        if(frameN == layer.frames.Count)
                         {
                             break;
                         }
+                        timeAcc += thisFrame.t;
                     }
-                    if (frameN == 0)
+                    if (substractFlag)
                     {
-                        frameN++;
+                        frameN--;
                     }
-                    frame = layer.frames[frameN - 1];
+                    frame = layer.frames[frameN];
                 }
                 sprite.setTextureCoordinates(frame.x, frame.y, frame.w, frame.h);
             }
@@ -129,7 +144,10 @@ namespace ClockworkHolographicClient.Content
             public static int maxId = 0;
         }
 
-
+        internal void deleteObject(int id)
+        {
+            objects.RemoveAll(x => x.id == id);
+        }
 
         private List<Object> objects;
         List<Sheet> sheets;
@@ -162,11 +180,15 @@ namespace ClockworkHolographicClient.Content
         public void loadJSONSpritesheets(String jsonSpritesheets)
         {
             List<JSONSpritesheet> spritesheets = (List<JSONSpritesheet>)Newtonsoft.Json.JsonConvert.DeserializeObject(jsonSpritesheets, typeof(List<JSONSpritesheet>));
-            sheets = spritesheets.Select(spritesheet => loadSpritesheet(spritesheet)).ToList<Sheet>();
+            sheets = spritesheets.Select(spritesheet => loadSpritesheet(spritesheet)).Where(x => x != null).ToList<Sheet>();
         }
 
         private Sheet loadSpritesheet(JSONSpritesheet spritesheet)
         {
+            if (spritesheet.src==null || !images.ContainsKey(spritesheet.src))
+            {
+                return null;
+            }
             //Create the sheet
             var sheet = new Sheet()
             {
@@ -195,7 +217,8 @@ namespace ClockworkHolographicClient.Content
                              x = kv.Value.x,
                              y = kv.Value.y,
                              frames = kv.Value.frames.Select(frame => frames.Find(x => String.Equals((String)frame, x.name))).ToList<Frame>(),
-                             length = kv.Value.frames.Select(frame => frames.Find(x => String.Equals((String)frame, x.name))).Aggregate<Frame, int>(0, (x, y) => x + y.t)
+                             length = kv.Value.frames.Select(frame => frames.Find(x => String.Equals((String)frame, x.name))).Aggregate<Frame, int>(0, (x, y) => x + y.t),
+                             infiniteLength = kv.Value.frames.Select(frame => frames.Find(x => String.Equals((String)frame, x.name))).Where(x => x.t == 0).Any()
                          };
             List<Layer> layers = query2.ToList<Layer>();
             //Load all the layers, and find the frames that belong to each one
@@ -204,15 +227,20 @@ namespace ClockworkHolographicClient.Content
                          {
                              name = kv.Key,
                              layers = kv.Value.layers.Select(layer => layers.Find(x => String.Equals((String)layer, x.name))).ToList<Layer>(),
-                             length = kv.Value.layers.Select(layer => layers.Find(x => String.Equals((String)layer, x.name))).Aggregate<Layer, int>(0, (x, y) => Math.Max(x, y.length))
+                             length = kv.Value.layers.Select(layer => layers.Find(x => String.Equals((String)layer, x.name))).Aggregate<Layer, int>(0, (x, y) => Math.Max(x, y.length)),
+                             infiniteLength = kv.Value.layers.Select(layer => layers.Find(x => String.Equals((String)layer, x.name))).Where(x => x.infiniteLength == true).Any()
                          };
             sheet.states = query3.ToList<State>();
             return sheet;
         }
 
-        public int addObject(String sheetName, String stateName, float x, float y, float z, bool isStatic)
+        public void addObject(int id, String sheetName, String stateName, float x, float y, float z, bool isStatic)
         {
             Sheet sheet = sheets.Find(a => String.Equals(a.name, sheetName));
+            if (sheet == null)
+            {
+                return;
+            }
             State state;
             if (stateName != null)
             {
@@ -222,18 +250,22 @@ namespace ClockworkHolographicClient.Content
             {
                 state = sheet.states.First();
             }
-            Object newObject = new Object(sheet, state, x, y, z, isStatic);
+            Object newObject = new Object(id,sheet, state, x, y, z, isStatic);
             objects.Add(newObject);
             if (areResourcesLoaded)
             {
                 newObject.sprite.CreateDeviceDependentResourcesAsync(deviceResources);
             }
-            return newObject.id;
         }
 
         public List<Sprite> getObjects()
         {
             return objects.Select(x => x.sprite).ToList<Sprite>();
+        }
+
+        public Object getObject(int id)
+        {
+            return objects.Where(x => x.id == id).FirstOrDefault();
         }
 
 
@@ -249,11 +281,14 @@ namespace ClockworkHolographicClient.Content
             objects.ForEach(x => x.update(millisecondsPerUpdate));
         }
 
-        private void setState(int id, string stateName)
+        public void setState(int id, string stateName)
         {
             Object o = objects.Find(x => x.id == id);
-            State state = o.states.Find(x => String.Equals(x.name, stateName));
-            o.setState(state);
+            if (o != null)
+            {
+                State state = o.sheet.states.Find(x => String.Equals(x.name, stateName));
+                o.setState(state);
+            }
         }
 
         private void setPosition(int id, float x, float y, float z)
